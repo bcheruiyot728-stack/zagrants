@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, Check, ChevronDown, Clock3, Gift, Globe2, LockKeyhole, Menu, ShieldCheck, Sparkles, Trophy, Users, X } from 'lucide-react'
 
-const apiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+const configuredApiUrl = import.meta.env.VITE_API_URL || (window.location.hostname === 'moveforwardsgrnt.vercel.app' ? 'https://zagrants.onrender.com' : '')
+const apiUrl = configuredApiUrl.replace(/\/$/, '')
 const apiFetch = (path, options) => fetch(`${apiUrl}${path}`, options)
 
 const gifts = [
